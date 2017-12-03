@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_agenda" default="compile.module.agenda">
+  <dirname property="module.agenda.basedir" file="${ant.file.module_agenda}"/>
+  
+  <property name="module.jdk.home.agenda" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.agenda" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.agenda" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.agenda" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="agenda.output.dir" value="${module.agenda.basedir}/out/production/Agenda"/>
+  <property name="agenda.testoutput.dir" value="${module.agenda.basedir}/out/test/Agenda"/>
+  
+  <path id="agenda.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="agenda.module.production.classpath">
+    <path refid="${module.jdk.classpath.agenda}"/>
+    <path refid="library.mysql-connector-java-5.1.45-bin.classpath"/>
+  </path>
+  
+  <path id="agenda.runtime.production.module.classpath">
+    <pathelement location="${agenda.output.dir}"/>
+    <path refid="library.mysql-connector-java-5.1.45-bin.classpath"/>
+  </path>
+  
+  <path id="agenda.module.classpath">
+    <path refid="${module.jdk.classpath.agenda}"/>
+    <pathelement location="${agenda.output.dir}"/>
+    <path refid="library.mysql-connector-java-5.1.45-bin.classpath"/>
+  </path>
+  
+  <path id="agenda.runtime.module.classpath">
+    <pathelement location="${agenda.testoutput.dir}"/>
+    <pathelement location="${agenda.output.dir}"/>
+    <path refid="library.mysql-connector-java-5.1.45-bin.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.agenda">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.agenda">
+    <patternset refid="excluded.from.module.agenda"/>
+  </patternset>
+  
+  <path id="agenda.module.sourcepath">
+    <dirset dir="${module.agenda.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.agenda" depends="compile.module.agenda.production,compile.module.agenda.tests" description="Compile module Agenda"/>
+  
+  <target name="compile.module.agenda.production" depends="register.custom.compilers" description="Compile module Agenda; production classes">
+    <mkdir dir="${agenda.output.dir}"/>
+    <javac2 destdir="${agenda.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.agenda}/javac">
+      <compilerarg line="${compiler.args.agenda}"/>
+      <bootclasspath refid="agenda.module.bootclasspath"/>
+      <classpath refid="agenda.module.production.classpath"/>
+      <src refid="agenda.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.agenda"/>
+    </javac2>
+    
+    <copy todir="${agenda.output.dir}">
+      <fileset dir="${module.agenda.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.agenda.tests" depends="register.custom.compilers,compile.module.agenda.production" description="compile module Agenda; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.agenda" description="cleanup module">
+    <delete dir="${agenda.output.dir}"/>
+    <delete dir="${agenda.testoutput.dir}"/>
+  </target>
+</project>
